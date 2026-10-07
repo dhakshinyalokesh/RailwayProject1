@@ -1,0 +1,54 @@
+static void requestPlatform() {
+
+    System.out.print("Enter Train ID: ");
+
+    String trainId = sc.next();
+
+    Train train = trains.get(trainId);
+
+    if (train == null) {
+
+        System.out.println("Train not found.");
+
+        return;
+    }
+
+    System.out.println("\nRequest Type:");
+
+    System.out.println("1. Emergency");
+    System.out.println("2. Connection");
+    System.out.println("3. Scheduled");
+
+    System.out.print("Enter request type: ");
+
+    int type = sc.nextInt();
+
+    if (type < 1 || type > 3) {
+
+        System.out.println(
+                "Invalid request type.");
+
+        return;
+    }
+
+    PlatformRequest request =
+            new PlatformRequest(
+                    train,
+                    type,
+                    nextRequestOrder);
+
+    nextRequestOrder++;
+
+    platformRequests.add(request);
+
+    System.out.println(
+            "Platform request added successfully.");
+
+    System.out.println(
+            "Train: "
+                    + train.getTrainId());
+
+    System.out.println(
+            "Request Type: "
+                    + getRequestTypeName(type));
+}

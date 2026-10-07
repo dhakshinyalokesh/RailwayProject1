@@ -12,6 +12,15 @@ public class RailwaySystem {
 
     static HashMap<Integer, Reservation> reservations =
             new HashMap<>();
+            static ArrayList<PlatformRequest> platformRequests =
+        new ArrayList<>();
+
+static ArrayList<PlatformAllocation> allocations =
+        new ArrayList<>();
+
+static int nextRequestOrder = 1;
+
+static final int CLEARANCE_BUFFER = 10;
 
     static int nextPassengerId = 1;
     static int nextReservationId = 1;
@@ -26,7 +35,7 @@ public class RailwaySystem {
         do {
 
             System.out.println("\n==========================");
-            System.out.println("CENTRAL RAILWAY STATION");
+            System.out.println("PAYANAM RAILWAY STATION");
             System.out.println("==========================");
 
             System.out.println("1. View Trains");
@@ -35,7 +44,10 @@ public class RailwaySystem {
             System.out.println("4. Cancel Booking");
             System.out.println("5. View Train Details");
             System.out.println("6. View Waiting List");
-            System.out.println("7. Exit");
+System.out.println("7. Request Platform");
+System.out.println("8. Allocate Platforms");
+System.out.println("9. View Platform Allocations");
+System.out.println("10. Exit");
 
             System.out.print("\nEnter your choice: ");
 
@@ -43,98 +55,82 @@ public class RailwaySystem {
 
             switch (choice) {
 
-                case 1:
-                    viewTrains();
-                    break;
+    case 1:
+        viewTrains();
+        break;
 
-                case 2:
-                    viewPlatforms();
-                    break;
+    case 2:
+        viewPlatforms();
+        break;
 
-                case 3:
-                    bookTicket();
-                    break;
+    case 3:
+        bookTicket();
+        break;
 
-                case 4:
-                    cancelBooking();
-                    break;
+    case 4:
+        cancelBooking();
+        break;
 
-                case 5:
-                    viewTrainDetails();
-                    break;
+    case 5:
+        viewTrainDetails();
+        break;
 
-                case 6:
-                    viewWaitingList();
-                    break;
+    case 6:
+        viewWaitingList();
+        break;
 
-                case 7:
-                    System.out.println("Program Closed.");
-                    break;
+    case 7:
+        requestPlatform();
+        break;
 
-                default:
-                    System.out.println("Invalid choice.");
-            }
+    case 8:
+        allocatePlatforms();
+        break;
 
-        } while (choice != 7);
+    case 9:
+        viewPlatformAllocations();
+        break;
+
+    case 10:
+        System.out.println("Program Closed.");
+        break;
+
+    default:
+        System.out.println("Invalid choice.");
+}
+
+        } while (choice != 10);
     }
 
 
-    // ==============================
-    // INITIAL DATA
-    // ==============================
+    
 
     static void initializeData() {
 
 
-    // =========================
-    // ADD 6 TRAINS
-    // =========================
+trains.put("T101",
+        new Train("T101", "Kongu Express",
+                10, 100, 130, 180, 2));
 
-    trains.put("T101", new Train("T101", "Kongu Express", 10));
-    trains.put("T102", new Train("T102", "Salem Express", 10));
-    trains.put("T103", new Train("T103", "Erode Passenger", 10));
-    trains.put("T104", new Train("T104", "Chennai Express", 10));
-    trains.put("T105", new Train("T105", "Coimbatore Special", 10));
-    trains.put("T106", new Train("T106", "Night Express", 10));
+trains.put("T102",
+        new Train("T102", "Salem Express",
+                10, 140, 170, 220, 3));
 
+trains.put("T103",
+        new Train("T103", "Erode Passenger",
+                10, 180, 210, 160, 1));
 
-    // =========================
-    // ADD 5 DEFAULT BOOKINGS
-    // FOR EACH TRAIN
-    // =========================
+trains.put("T104",
+        new Train("T104", "Chennai Express",
+                10, 220, 260, 300, 4));
 
-    for (Train train : trains.values()) {
+trains.put("T105",
+        new Train("T105", "Coimbatore Special",
+                10, 280, 310, 200, 2));
 
-        for (int i = 0; i < 5; i++) {
-
-            Passenger passenger = new Passenger(
-                    "P" + nextPassengerId,
-                    "Passenger " + nextPassengerId);
-
-            nextPassengerId++;
-
-            boolean booked = train.bookTicket(passenger);
-
-            if (booked) {
-
-                Reservation reservation = new Reservation(
-                        nextReservationId,
-                        passenger,
-                        train.getTrainId());
-
-                reservations.put(
-                        nextReservationId,
-                        reservation);
-
-                nextReservationId++;
-            }
-        }
-    }
-
-
-    // =========================
-    // ADD 3 PLATFORMS
-    // =========================
+trains.put("T106",
+        new Train("T106", "Night Express",
+                10, 330, 360, 250, 3));
 
     platforms.put(1, new Platform(1, 200));
     platforms.put(2, new Platform(2, 280));
@@ -150,27 +146,47 @@ public class RailwaySystem {
 
 
 
-    // ==============================
-    // 1. VIEW TRAINS
-    // ==============================
+    
 
-    static void viewTrains() {
 
-        System.out.println("\n--- TRAIN LIST ---");
 
-        for (Train train : trains.values()) {
+static void viewTrains() {
 
-            System.out.println(
-                    train.getTrainId()
-                            + " - "
-                            + train.getTrainName());
-        }
+    System.out.println("\n========== TRAIN DETAILS ==========");
+
+    for (Train train : trains.values()) {
+
+        System.out.println("\n----------------------------------");
+
+        System.out.println("Train ID       : "
+                + train.getTrainId());
+
+        System.out.println("Train Name     : "
+                + train.getTrainName());
+
+        System.out.println("Arrival Time   : "
+                + train.getArrivalTime());
+
+        System.out.println("Departure Time : "
+                + train.getDepartureTime());
+
+        System.out.println("Train Length   : "
+                + train.getTrainLength());
+
+        System.out.println("Priority       : "
+                + train.getTrainPriority());
+
+        System.out.println("Available Seats: "
+                + train.getAvailableSeats()
+                + "/" + train.getTotalSeats());
+
+        System.out.println("----------------------------------");
     }
+}
 
 
-    // ==============================
-    // 2. VIEW PLATFORMS
-    // ==============================
+
+   
 
     static void viewPlatforms() {
 
@@ -189,9 +205,7 @@ public class RailwaySystem {
     }
 
 
-    // ==============================
-    // 3. BOOK TICKET
-    // ==============================
+   
 
     static void bookTicket() {
 
@@ -238,11 +252,12 @@ public class RailwaySystem {
                     reservation);
 
             System.out.println(
-                    "Booking Confirmed!");
+        "Booking Confirmed!");
 
-            System.out.println(
-                    "Reservation ID: "
-                            + nextReservationId);
+System.out.println(
+        "Reservation ID: PNR"
+                + String.format("%06d", nextReservationId));
+
 
             nextReservationId++;
 
@@ -257,23 +272,28 @@ public class RailwaySystem {
     }
 
 
-    // ==============================
-    // 4. CANCEL BOOKING
-    // ==============================
+  
 
-    static void cancelBooking() {
+  static void cancelBooking() {
 
-        System.out.print(
-                "Enter Reservation ID: ");
+    System.out.print("Enter Reservation ID: ");
+    String pnr = sc.next();
 
-        int reservationId = sc.nextInt();
+    if (!pnr.startsWith("PNR")) {
+        System.out.println(
+                "Invalid Reservation ID. Use format like PNR000001.");
+        return;
+    }
+
+    try {
+
+        int reservationId =
+                Integer.parseInt(pnr.substring(3));
 
         Reservation reservation =
                 reservations.get(reservationId);
 
-
-        if (reservation == null
-                || !reservation.isActive()) {
+        if (reservation == null || !reservation.isActive()) {
 
             System.out.println(
                     "Reservation not found.");
@@ -281,21 +301,17 @@ public class RailwaySystem {
             return;
         }
 
-
         Train train =
                 trains.get(
                         reservation.getTrainId());
-
 
         reservation.cancel();
 
         Passenger promoted =
                 train.cancelTicket();
 
-
         System.out.println(
                 "Booking Cancelled Successfully.");
-
 
         if (promoted != null) {
 
@@ -303,58 +319,71 @@ public class RailwaySystem {
                     "Waiting Passenger Promoted: "
                             + promoted.getName());
         }
+
+    } catch (NumberFormatException e) {
+
+        System.out.println(
+                "Invalid Reservation ID. Use format like PNR000001.");
     }
+}
 
-
-    // ==============================
-    // 5. VIEW TRAIN DETAILS
-    // ==============================
 
     static void viewTrainDetails() {
 
-        System.out.print("Enter Train ID: ");
+    System.out.print("Enter Train ID: ");
 
-        String trainId = sc.next();
+    String trainId = sc.next();
 
-        Train train = trains.get(trainId);
+    Train train = trains.get(trainId);
 
+    if (train == null) {
 
-        if (train == null) {
+        System.out.println("Train not found.");
 
-            System.out.println("Train not found.");
-
-            return;
-        }
-
-
-        System.out.println(
-                "\n--- TRAIN DETAILS ---");
-
-        System.out.println(
-                "Train ID: "
-                        + train.getTrainId());
-
-        System.out.println(
-                "Train Name: "
-                        + train.getTrainName());
-
-        System.out.println(
-                "Total Seats: "
-                        + train.getTotalSeats());
-
-        System.out.println(
-                "Available Seats: "
-                        + train.getAvailableSeats());
-
-        System.out.println(
-                "Waiting Passengers: "
-                        + train.getWaitingList().size());
+        return;
     }
 
+    System.out.println(
+            "\n--- TRAIN DETAILS ---");
 
-    // ==============================
-    // 6. VIEW WAITING LIST
-    // ==============================
+    System.out.println(
+            "Train ID: "
+                    + train.getTrainId());
+
+    System.out.println(
+            "Train Name: "
+                    + train.getTrainName());
+
+    System.out.println(
+            "Total Seats: "
+                    + train.getTotalSeats());
+
+    System.out.println(
+            "Available Seats: "
+                    + train.getAvailableSeats());
+
+    System.out.println(
+            "Waiting Passengers: "
+                    + train.getWaitingList().size());
+
+    System.out.println(
+            "Arrival Time: "
+                    + train.getArrivalTime());
+
+    System.out.println(
+            "Departure Time: "
+                    + train.getDepartureTime());
+
+    System.out.println(
+            "Train Length: "
+                    + train.getTrainLength());
+
+    System.out.println(
+            "Train Priority: "
+                    + train.getTrainPriority());
+
+}
+
 
     static void viewWaitingList() {
 
@@ -394,5 +423,221 @@ public class RailwaySystem {
                             + " - "
                             + passenger.getName());
         }
+    }static void requestPlatform() {
+
+    System.out.print("Enter Train ID: ");
+
+    String trainId = sc.next();
+
+    Train train = trains.get(trainId);
+
+    if (train == null) {
+
+        System.out.println("Train not found.");
+
+        return;
     }
+
+    System.out.println("\nRequest Type:");
+
+    System.out.println("1. Emergency");
+    System.out.println("2. Connection");
+    System.out.println("3. Scheduled");
+
+    System.out.print("Enter request type: ");
+
+    int type = sc.nextInt();
+
+    if (type < 1 || type > 3) {
+
+        System.out.println(
+                "Invalid request type.");
+
+        return;
+    }
+
+    PlatformRequest request =
+            new PlatformRequest(
+                    train,
+                    type,
+                    nextRequestOrder);
+
+    nextRequestOrder++;
+
+    platformRequests.add(request);
+
+    System.out.println(
+            "Platform request added successfully.");
+
+    System.out.println(
+            "Train: "
+                    + train.getTrainId());
+
+    System.out.println(
+            "Request Type: "
+                    + getRequestTypeName(type));
+}
+static String getRequestTypeName(int type) {
+
+    if (type == 1) {
+        return "Emergency";
+    }
+
+    if (type == 2) {
+        return "Connection";
+    }
+
+    return "Scheduled";
+}
+static void allocatePlatforms() {
+
+    if (platformRequests.isEmpty()) {
+
+        System.out.println(
+                "No platform requests available.");
+
+        return;
+    }
+
+    // Sort by priority first.
+    // If priority is same, use request order.
+    platformRequests.sort(
+            Comparator
+                    .comparingInt(
+                            PlatformRequest::getPriority)
+                    .thenComparingInt(
+                            PlatformRequest::getArrivalOrder));
+
+    for (PlatformRequest request :
+            platformRequests) {
+
+        Train train = request.getTrain();
+
+        boolean allocated = false;
+
+        for (Platform platform :
+                platforms.values()) {
+
+            // Check platform length
+            if (platform.getPlatformLength()
+                    < train.getTrainLength()) {
+
+                continue;
+            }
+
+            int startTime =
+                    train.getArrivalTime();
+
+            int endTime =
+                    train.getDepartureTime()
+                            + CLEARANCE_BUFFER;
+
+            // Check time conflict
+            if (hasPlatformConflict(
+                    platform.getPlatformId(),
+                    startTime,
+                    endTime)) {
+
+                continue;
+            }
+
+            PlatformAllocation allocation =
+                    new PlatformAllocation(
+                            train.getTrainId(),
+                            platform.getPlatformId(),
+                            startTime,
+                            endTime);
+
+            allocations.add(allocation);
+
+            System.out.println(
+                    "\nPlatform Allocated Successfully!");
+
+            System.out.println(
+                    "Train: "
+                            + train.getTrainId());
+
+            System.out.println(
+                    "Platform: "
+                            + platform.getPlatformId());
+
+            System.out.println(
+                    "Occupied From: "
+                            + startTime);
+
+            System.out.println(
+                    "Occupied Until: "
+                            + endTime);
+
+            allocated = true;
+
+            break;
+        }
+
+        if (!allocated) {
+
+            System.out.println(
+                    "\nPlatform Allocation Failed.");
+
+            System.out.println(
+                    "Train: "
+                            + train.getTrainId());
+
+            System.out.println(
+                    "No suitable platform available.");
+        }
+    }
+
+    // Requests have now been processed
+    platformRequests.clear();
+}
+static boolean hasPlatformConflict(
+        int platformId,
+        int newStart,
+        int newEnd) {
+
+    for (PlatformAllocation allocation :
+            allocations) {
+
+        if (allocation.getPlatformId()
+                == platformId) {
+
+            if (allocation.overlaps(
+                    newStart,
+                    newEnd)) {
+
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+static void viewPlatformAllocations() {
+
+    System.out.println(
+            "\n--- PLATFORM ALLOCATIONS ---");
+
+    if (allocations.isEmpty()) {
+
+        System.out.println(
+                "No platforms allocated.");
+
+        return;
+    }
+
+    for (PlatformAllocation allocation :
+            allocations) {
+
+        System.out.println(
+                "Train: "
+                        + allocation.getTrainId()
+                        + " | Platform: "
+                        + allocation.getPlatformId()
+                        + " | Start: "
+                        + allocation.getStartTime()
+                        + " | End: "
+                        + allocation.getEndTime());
+    }
+}
 }

@@ -7,15 +7,32 @@ public class Train {
     private int totalSeats;
     private int availableSeats;
 
+    // Platform-related information
+    private int arrivalTime;
+    private int departureTime;
+    private int trainLength;
+    private int trainPriority;
+
     private ArrayDeque<Passenger> waitingList =
             new ArrayDeque<>();
 
-    public Train(String trainId, String trainName, int totalSeats) {
+    // Constructor
+    public Train(String trainId, String trainName,
+                 int totalSeats,
+                 int arrivalTime,
+                 int departureTime,
+                 int trainLength,
+                 int trainPriority) {
 
         this.trainId = trainId;
         this.trainName = trainName;
         this.totalSeats = totalSeats;
         this.availableSeats = totalSeats;
+
+        this.arrivalTime = arrivalTime;
+        this.departureTime = departureTime;
+        this.trainLength = trainLength;
+        this.trainPriority = trainPriority;
     }
 
     public String getTrainId() {
@@ -34,11 +51,26 @@ public class Train {
         return availableSeats;
     }
 
+    public int getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public int getDepartureTime() {
+        return departureTime;
+    }
+
+    public int getTrainLength() {
+        return trainLength;
+    }
+
+    public int getTrainPriority() {
+        return trainPriority;
+    }
+
     public ArrayDeque<Passenger> getWaitingList() {
         return waitingList;
     }
 
-    // Book ticket
     public boolean bookTicket(Passenger passenger) {
 
         if (availableSeats > 0) {
@@ -53,12 +85,10 @@ public class Train {
         return false;
     }
 
-    // Cancel ticket
     public Passenger cancelTicket() {
 
         availableSeats++;
 
-        // Promote first waiting passenger
         if (!waitingList.isEmpty()) {
 
             Passenger promotedPassenger =

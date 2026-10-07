@@ -15,4 +15,4 @@ public class Passenger {
     public String getName() {
         return name;
     }
-}
+}                                                   
